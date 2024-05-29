@@ -1,6 +1,6 @@
 # Bubu
 
-Bubu is a dada2 based 16s RNA metagenomic pipeline for Illumina sequencing platforms with built-in quality control metrics.
+Bubu is a dada2 based 16S RNA metagenomic pipeline for Illumina sequencing platforms with built-in quality control metrics.
 
 ## WARNING!
 
