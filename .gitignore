@@ -1,0 +1,8 @@
+# vs code stuff
+.vscode/
+
+# exclude experiment configurations 
+experiments.json
+
+# linux file explorer stuff
+.directory
