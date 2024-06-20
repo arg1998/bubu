@@ -23,7 +23,7 @@ d2w_configs$validate_configurations <- function(experiments) {
 
 
 # set up the directory structure for the experiment and return the path
-# TODO: reqrite this function to output a JSON file with the experiment details along with computecanada configurations
+# TODO: require this function to output a JSON file with the experiment details along with computecanada configurations
 d2w_configs$setup_experiment <- function(experiment) {
     # create an experiment id and create the directory structure
     if (!endsWith(experiment$settings$output_directory, "/")) {
@@ -64,13 +64,29 @@ d2w_configs$setup_experiment <- function(experiment) {
     return(experiment)
 }
 
-
 d2w_configs$close_experiment <- function(experiment) {
-    # close the experiment
-    total_runtime <- d2w_timer$elapsed_time_str()
-    configs <- file(paste0(experiment$runtime$directory, "runtime.json"), open = "w")
-    runtime_data <- experiment$runtime
-    runtime_data$runtime_duration <- total_runtime
-    writeLines(jsonlite::toJSON(runtime_data, simplifyVector = TRUE, pretty = 4, auto_unbox = TRUE), configs)
-    close(configs)
+    tryCatch(
+        {
+            # Close the experiment
+            total_runtime <- d2w_timer$elapsed_time_str()
+            configs <- file(paste0(experiment$runtime$directory, "runtime.json"), open = "w")
+            runtime_data <- experiment$runtime
+            runtime_data$runtime_duration <- total_runtime
+            writeLines(jsonlite::toJSON(runtime_data, simplifyVector = TRUE, pretty = 4, auto_unbox = TRUE), configs)
+            close(configs)
+        },
+        error = function(e) {
+            message("An error occurred: ", e$message)
+            if (exists("configs")) {
+                tryCatch(
+                    {
+                        close(configs)
+                    },
+                    error = function(e) {
+                        message("Failed to close the file: ", e$message)
+                    }
+                )
+            }
+        }
+    )
 }
