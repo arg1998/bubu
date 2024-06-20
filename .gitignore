@@ -2,7 +2,7 @@
 .vscode/
 
 # exclude experiment configurations 
-experiments.json
+experiments*.json
 
 # linux file explorer stuff
 .directory
