@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 import time
+import math
 
 
 def colorize(text, color):
@@ -124,11 +125,11 @@ def page_current_jobs():
     def get_user_slurm_jobs():
         push_loading_screen()
         command = 'squeue -u $(whoami) --noheader --format="%A;%u;%T;%M;%L;%D;%m;%C"'
-        result = subprocess.run(command, stdout=subprocess.PIPE, shell=True, text=True)
-        #result = "32760913;trmshk;RUNNING;42:55;4:17:05;1;64G;12\n32760912;trmshk;PD;42:55;4:17;1;64G;12"
+        # result = subprocess.run(command, stdout=subprocess.PIPE, shell=True, text=True).stdout
+        result = "32760913;trmshk;RUNNING;42:55;4:17:05;1;64G;12\n32760912;trmshk;PD;42:55;4:17;1;64G;12"
         #time.sleep(1)
         job_ids.clear()
-        lines = result.stdout.strip().splitlines() 
+        lines = result.strip().splitlines() 
         jobs = [line.split(';') for line in lines]
         for job in jobs:
             job_ids.append(job[0])
@@ -232,11 +233,59 @@ def page_current_jobs():
 
 def page_new_job():
     #TODO: implement this
+
+    cc_job_res = {
+        "cpu" : None,
+        "mem" : None,
+        "time.h": None,
+        "time.m": None,
+        "email": None
+    }
+    current_step = 0
+    steps = [
+        {"res": "cpu",     "title": "CPU Cores",    "message": f"Enter the numebr of {green(bold('CPU'))} cores",                       "default": 4,       "min": 1,       "max": 64       },
+        {"res": "mem",     "title": "RAM Memory",   "message": f"Enter the amount of {green(bold('RAM'))} in GB",                       "default": 32,      "min": 4,       "max": 1024     },
+        {"res": "time.h",  "title": "Hours",        "message": f"Enter the numebr of {green(bold('Hours'))} needed for the job",        "default": 2,       "min": 0,       "max": math.inf },
+        {"res": "time.m",  "title": "Minutes",      "message": f"Enter the numebr of {green(bold('Minutes'))} needed for the job",      "default": 4,       "min": 0,       "max": 59       },
+        {"res": "email",   "title": "Email",        "message": f"Enter an {green(bold('Email Address'))} to send notifications",        "default": None,    "min": None,    "max": None     }
+    ]
+
+    def process_and_update_step(step_counter):
+        if(step_counter == len(steps)):
+            return -1
+        step = steps[step_counter]
+        user_prompt = step["message"]
+        if step["default"] != None:
+            default = yellow(f'default is {step["default"]}')
+            user_prompt = f'{user_prompt} ({default}): '
+        else:
+            default = yellow('leave empty to ignore')
+            user_prompt = f'{user_prompt} ({default}): '
+        
+        show_messages()
+        user_input = input(user_prompt)
+        user_input = int(user_input, base=10)
+        if (step["min"] != None) and (step["max"] != None): 
+            if user_input > step["max"] or user_input < step["min"]:
+                #FIXME: finish this part
+                user_message = red(f'Invalid input. Value must follow ≤ ≤')
+                push_message
+
+
+    def show_completed_steps():
+        pass
+
     while True:
         clear_terminal()
         show_navigation_path()
-        print(f'{red("NOT IMPLEMENTED YET!")}\n\n')
-        user_input = input(f'Press any key to go back !!! ')
+        print(f'Enter {red("Q")} at any step to go back to the main menu')
+        print(f'Enter {yellow("Z")} to go to previous step')
+        show_completed_steps(current_step)
+        current_step = process_and_update_step(current_step)
+        if current_step != -1:
+            # continue if there are some steps remaining
+            continue
+
         break
 
 def page_help():
