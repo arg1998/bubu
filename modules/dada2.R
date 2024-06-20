@@ -34,6 +34,11 @@ d2w_dada$generate_quality_profile_plots <- function(experiment) {
         d2w_logger$logi("Skipping quality profile plot generation")
         return()
     }
+    
+    if(!experiment$quality_control$quality_profile_plot){
+        d2w_logger$logi("Skipping quality profile plot generation")
+        return()
+    }
     d2w_logger$logi("Generating quality profile plots")
 
     # Visualize quality profiles of random samples

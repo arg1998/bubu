@@ -13,6 +13,7 @@ source("./modules/dada2.R") # for running the dada2 pipeline
 
 # load the experiment.json file
 experiment_configs <- d2w_configs$load_experiments()
+# TODO: for each experiment, delete object to release memory
 
 for (experiment in experiment_configs) {
     if (experiment$settings$run_experiment == FALSE) {
@@ -59,6 +60,13 @@ for (experiment in experiment_configs) {
         experiment <- d2w_dada$sub_sample_input_files(experiment)
         d2w_logger$logi("Number of sampled PIDs: ", experiment$runtime$samples$num_samples)
         d2w_logger$print("Sampled PID names:\n", paste0(experiment$runtime$samples$names, collapse = ", "), "\n")
+    }
+
+    if (experiment$settings$verbose_output) {
+        d2w_logger$logv("Forward Reads Files:\n", verbose = experiment$settings$verbose_output)
+        d2w_logger$print(paste0(experiment$runtime$samples$forward, collapse = "\n"))
+        d2w_logger$logv("\n\nForward Reads Files:\n", verbose = experiment$settings$verbose_output)
+        d2w_logger$print(paste0(experiment$runtime$samples$reverse, collapse = "\n"))
     }
 
 
