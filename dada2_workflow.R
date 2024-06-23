@@ -65,7 +65,7 @@ for (experiment in experiment_configs) {
     if (experiment$settings$verbose_output) {
         d2w_logger$logv("Forward Reads Files:\n", verbose = experiment$settings$verbose_output)
         d2w_logger$print(paste0(experiment$runtime$samples$forward, collapse = "\n"))
-        d2w_logger$logv("\n\nForward Reads Files:\n", verbose = experiment$settings$verbose_output)
+        d2w_logger$logv("\n\nReverse Reads Files:\n", verbose = experiment$settings$verbose_output)
         d2w_logger$print(paste0(experiment$runtime$samples$reverse, collapse = "\n"))
     }
 
@@ -99,8 +99,10 @@ for (experiment in experiment_configs) {
     out_filter_and_trim <- filterAndTrim(experiment$runtime$samples$forward, filtFs, experiment$runtime$samples$reverse, filtRs,
         truncLen = c(experiment$filter_and_trim$truncate$forward, experiment$filter_and_trim$truncate$reverse),
         trimLeft = c(experiment$filter_and_trim$trim_lef$forward, experiment$filter_and_trim$trim_lef$reverse),
-        maxN = 0, maxEE = c(2, 2), truncQ = 2, rm.phix = experiment$filter_and_trim$remove_phix_genome, # TODO: investigate maxEE and truncQ
-        minLen = experiment$filter_and_trim$min_read_length, compress = TRUE, multithread = experiment$settings$multi_thread
+        maxN = 0, maxEE = c(2, 2), truncQ = 2, # TODO: investigate maxEE and truncQ
+        rm.phix = experiment$filter_and_trim$remove_phix_genome,
+        minLen = experiment$filter_and_trim$min_read_length, compress = TRUE, multithread = experiment$settings$multi_thread,
+        verbose = experiment$settings$verbose_output
     )
 
     df.filter.trim <- out_filter_and_trim %>% as.data.frame()
