@@ -246,17 +246,17 @@ for (experiment in experiment_configs) {
         d2w_logger$logi("Assigning Taxonomy (Kingdom:Genus) to ASVs using ", fasta_train_file)
         taxonomy_table <- assignTaxonomy(seq_tab_no_chimera, refFasta = fastaConfig$train_set_path, tryRC = fastaConfig$reverse_match_taxa, multithread = experiment$settings$multi_thread)
         saveObj(taxonomy_table, paste0("taxonomy_table_", tolower(fasta_train_file)))
-        asv_stat_cols <- c("ASV", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
+        
 
         # check if the experiment requires assigning species to the ASVs
         if (fastaConfig$assign_species) {
             d2w_logger$logi(paste0("Assigning species to ASVs using ", fasta_train_file))
             taxonomy_table <- addSpecies(taxonomy_table, refFasta = fastaConfig$species_train_set_path, tryRC = fastaConfig$reverse_match_taxa, allowMultiple = fastaConfig$allow_multiple_species, verbose = experiment$settings$verbose_output)
             saveObj(taxonomy_table, paste0("taxonomy_table_species_", tolower(fasta_train_file)))
-            asv_stat_cols <- c(asv_stat_cols, "Species")
         }
 
         d2w_logger$logi("Generating ASV Statistics for ", fasta_train_file)
+        asv_stat_cols <- c("ASV", colnames(taxonomy_table))
         otu.stat <- as.data.frame(taxonomy_table)
         otu.stat[, "ASV"] <- rownames(otu.stat)
         otu.stat.num.asv <- nrow(otu.stat)
