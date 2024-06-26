@@ -3,6 +3,7 @@
 
 # exclude experiment configurations 
 experiments*.json
+experiments*.json.backup*
 
 # linux file explorer stuff
 .directory
