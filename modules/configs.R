@@ -38,18 +38,19 @@ d2w_configs$setup_experiment <- function(experiment) {
     d2w_io$mkdirs(paste0(experiment$runtime$directory, "logs/"))
 
 
-
-    envs <- Sys.getenv()
+    # this needs to be converted to a List, otherwise when we try to output to json,
+    # jsonlite package does not handle Dlist classes used internally by R!!! how weird!
+    envs <- as.list(Sys.getenv())
     experiment$runtime$is_compute_canada <- FALSE
-    if (!is.na(envs["SLURM_JOB_ID"])) {
+    if (!is.null(envs[["SLURM_JOB_ID"]])) {
         experiment$runtime$is_compute_canada <- TRUE
         experiment$runtime$environment$name <- "Compute Canada"
-        experiment$runtime$environment$job_id <- envs["SLURM_JOB_ID"]
-        experiment$runtime$environment$cluster_name <- envs["SLURM_CLUSTER_NAME"]
-        cc_mempernode <- as.numeric(envs["SLURM_MEM_PER_NODE"])
+        experiment$runtime$environment$job_id <- as.character(envs[["SLURM_JOB_ID"]])
+        experiment$runtime$environment$cluster_name <- as.character(envs[["SLURM_CLUSTER_NAME"]])
+        cc_mempernode <- as.numeric(envs[["SLURM_MEM_PER_NODE"]])
         experiment$runtime$environment$memory_per_task <- paste0((cc_mempernode / 1024), "GB")
-        experiment$runtime$environment$cpu_per_task <- as.numeric(envs["SLURM_CPUS_PER_TASK"])
-        experiment$runtime$environment$duration <- d2w_timer$secondsToTimeFormat(as.numeric(envs["SLURM_JOB_END_TIME"]) - as.numeric(envs["SLURM_JOB_START_TIME"]))
+        experiment$runtime$environment$cpu_per_task <- as.numeric(envs[["SLURM_CPUS_PER_TASK"]])
+        experiment$runtime$environment$duration <- d2w_timer$secondsToTimeFormat(as.numeric(envs[["SLURM_JOB_END_TIME"]]) - as.numeric(envs[["SLURM_JOB_START_TIME"]]))
     }
 
     configs <- file(paste0(experiment$runtime$directory, "experiment.json"), open = "w")
@@ -65,28 +66,11 @@ d2w_configs$setup_experiment <- function(experiment) {
 }
 
 d2w_configs$close_experiment <- function(experiment) {
-    tryCatch(
-        {
-            # Close the experiment
-            total_runtime <- d2w_timer$elapsed_time_str()
-            configs <- file(paste0(experiment$runtime$directory, "runtime.json"), open = "w")
-            runtime_data <- experiment$runtime
-            runtime_data$runtime_duration <- total_runtime
-            writeLines(jsonlite::toJSON(runtime_data, simplifyVector = TRUE, pretty = 4, auto_unbox = TRUE), configs)
-            close(configs)
-        },
-        error = function(e) {
-            message("An error occurred: ", e$message)
-            if (exists("configs")) {
-                tryCatch(
-                    {
-                        close(configs)
-                    },
-                    error = function(e) {
-                        message("Failed to close the file: ", e$message)
-                    }
-                )
-            }
-        }
-    )
+    # Close the experiment
+    total_runtime <- d2w_timer$elapsed_time_str()
+    configs <- file(paste0(experiment$runtime$directory, "runtime.json"), open = "w")
+    runtime_data <- experiment$runtime
+    runtime_data$runtime_duration <- total_runtime
+    writeLines(jsonlite::toJSON(runtime_data, simplifyVector = TRUE, pretty = 4, auto_unbox = TRUE), configs)
+    close(configs)
 }
