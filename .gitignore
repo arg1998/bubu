@@ -6,3 +6,6 @@ experiments*.json
 
 # linux file explorer stuff
 .directory
+
+# exclude SLURM outputs
+slurm*.out
