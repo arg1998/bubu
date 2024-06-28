@@ -63,9 +63,12 @@ for (experiment in experiment_configs) {
     }
 
     if (experiment$settings$verbose_output) {
-        d2w_logger$logv("Forward Reads Files:\n", verbose = experiment$settings$verbose_output)
+        count <- paste0("(Number of Samples = ", length(experiment$runtime$samples$forward), " )")
+        d2w_logger$logv("Forward Reads Files ", count, ":\n", verbose = experiment$settings$verbose_output)
         d2w_logger$print(paste0(experiment$runtime$samples$forward, collapse = "\n"))
-        d2w_logger$logv("\n\nReverse Reads Files:\n", verbose = experiment$settings$verbose_output)
+
+        count <- paste0("(Number of Samples = ", length(experiment$runtime$samples$reverse), " )")
+        d2w_logger$logv("\n\nReverse Reads Files ", count, ":\n", verbose = experiment$settings$verbose_output)
         d2w_logger$print(paste0(experiment$runtime$samples$reverse, collapse = "\n"))
     }
 
@@ -94,6 +97,12 @@ for (experiment in experiment_configs) {
     filtRs <- file.path(experiment$input_data$output_filtered_fastq_directory, paste0(experiment$runtime$samples$names, "_R_filt.fastq.gz"))
     names(filtFs) <- experiment$runtime$samples$names
     names(filtRs) <- experiment$runtime$samples$names
+
+    # running some assertion before commiting to DADA2 pipeline
+    d2w_logger$logi("Running sanity check assertions on input data")
+    assertthat::are_equal(length(filtFs), length(filtRs))
+    assertthat::are_equal(length(experiment$runtime$samples$forward), length(filtFs))
+    assertthat::are_equal(length(experiment$runtime$samples$reverse), length(filtRs))
 
     # Filter and trim reads
     out_filter_and_trim <- filterAndTrim(experiment$runtime$samples$forward, filtFs, experiment$runtime$samples$reverse, filtRs,
