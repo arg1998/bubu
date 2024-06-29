@@ -51,8 +51,8 @@ for (experiment in experiment_configs) {
     if (d2w_dada$has_custom_pids(experiment)) {
         d2w_logger$logi("Selecting custom samples (PIDs) from the list of all samples")
         experiment <- d2w_dada$read_custom_pid_samples(experiment)
-        # TODO: print the number of PIDs read
-        d2w_logger$logv("Custom sample names:\n", paste0(experiment$runtime$samples$names, collapse = ", "), "\n", verbose = experiment$settings$verbose_output)
+        count <- paste0("(Number of PIDs read = ", length(experiment$runtime$samples$names), " )")
+        d2w_logger$logv("Custom sample names ", count, ": \n", paste0(experiment$runtime$samples$names, collapse = ", "), "\n", verbose = experiment$settings$verbose_output)
     }
 
 
