@@ -51,6 +51,7 @@ for (experiment in experiment_configs) {
     if (d2w_dada$has_custom_pids(experiment)) {
         d2w_logger$logi("Selecting custom samples (PIDs) from the list of all samples")
         experiment <- d2w_dada$read_custom_pid_samples(experiment)
+        # TODO: print the number of PIDs read
         d2w_logger$logv("Custom sample names:\n", paste0(experiment$runtime$samples$names, collapse = ", "), "\n", verbose = experiment$settings$verbose_output)
     }
 
@@ -144,6 +145,8 @@ for (experiment in experiment_configs) {
     derepFs <- derepFastq(filtFs[exists], verbose = experiment$settings$verbose_output)
     names(derepFs) <- experiment$runtime$samples$names[exists]
 
+    # Check for the existence of filtered sequence files
+    exists <- file.exists(filtRs) # Check for reverse reads
     # Dereplicate reverse reads
     derepRs <- derepFastq(filtRs[exists], verbose = experiment$settings$verbose_output)
     names(derepRs) <- experiment$runtime$samples$names[exists]
@@ -179,6 +182,16 @@ for (experiment in experiment_configs) {
     mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose = experiment$settings$verbose_output)
     d2w_logger$logi("Finished merging paired-end reads")
     saveObj(mergers, "mergers")
+
+    # free memory
+    rm(derepFs)
+    rm(derepRs)
+
+    rm(errFs)
+    rm(errRs)
+
+    d2w_logger$logv("Calling Garbage Collector to free memory", verbose = experiment$settings$verbose_output)
+    gc(verbose = experiment$settings$verbose_output)
 
     # -------------------- Remove Chimeras
     d2w_logger$logs("Removing Chimeras")
@@ -255,7 +268,7 @@ for (experiment in experiment_configs) {
         d2w_logger$logi("Assigning Taxonomy (Kingdom:Genus) to ASVs using ", fasta_train_file)
         taxonomy_table <- assignTaxonomy(seq_tab_no_chimera, refFasta = fastaConfig$train_set_path, tryRC = fastaConfig$reverse_match_taxa, multithread = experiment$settings$multi_thread)
         saveObj(taxonomy_table, paste0("taxonomy_table_", tolower(fasta_train_file)))
-        
+
 
         # check if the experiment requires assigning species to the ASVs
         if (fastaConfig$assign_species) {
@@ -293,6 +306,20 @@ for (experiment in experiment_configs) {
 
     # close the experiment and write out the final results
     d2w_configs$close_experiment(experiment)
+
+    # clear the memory and free allocated resources
+    rm(dadaFs)
+    rm(dadaRs)
+    rm(out_filter_and_trim)
+    rm(mergers)
+    rm(seq_table_from_mergers)
+    rm(seq_tab_no_chimera)
+    rm(taxonomy_table)
+    d2w_logger$logv("Calling Garbage Collector to free memory", verbose = experiment$settings$verbose_output)
+    gc(verbose = experiment$settings$verbose_output)
+
+
+
 }
 
 
