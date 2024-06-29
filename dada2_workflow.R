@@ -317,9 +317,6 @@ for (experiment in experiment_configs) {
     rm(taxonomy_table)
     d2w_logger$logv("Calling Garbage Collector to free memory", verbose = experiment$settings$verbose_output)
     gc(verbose = experiment$settings$verbose_output)
-
-
-
 }
 
 
