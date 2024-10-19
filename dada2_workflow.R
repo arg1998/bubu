@@ -75,13 +75,17 @@ for (experiment in experiment_configs) {
 
 
     # --------------------- quality plots
-    d2w_logger$logs("Generating Quality Plots")
-    d2w_dada$generate_quality_profile_plots(experiment)
-    d2w_dada$run_multiqc(experiment)
+    if (experiment$settings$pipeline$quality_control) {
+        d2w_logger$logs("Quality Control")
+        d2w_dada$generate_quality_profile_plots(experiment)
+        d2w_dada$run_multiqc(experiment)
+    } else {
+        d2w_logger$logs("Skipping Quality Control Step")
+    }
 
 
 
-    if (d2w_dada$should_begin_dada2_pipeline(experiment) == FALSE) {
+    if (! experiment$settings$pipeline$dada) {
         d2w_logger$logs("Skipping DADA2 pipeline for experiment: ", experiment$settings$name)
         # close the experiment and write out the final results
         d2w_configs$close_experiment(experiment)

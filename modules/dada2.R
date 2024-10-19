@@ -15,18 +15,6 @@ d2w_dada$normalize_pids <- function(pid_list, sub_underscore = TRUE, sub_space =
     return(pid_list)
 }
 
-# this function is used to check if the experiment has the necessary steps to run the dada2 pipeline
-d2w_dada$should_begin_dada2_pipeline <- function(experiment) {
-    if (is.null(experiment$filter_and_trim) || # check if the filter_and_trim step is missing
-        is.null(experiment$asv_inference) || # check if the asv_inference step is missing
-        is.null(experiment$taxonomy_assignment) # check if the taxonomy_assignment step is missing
-    ) {
-        return(FALSE) # return false if any of the steps are missing and abort the DADA2 pipeline
-    }
-    return(TRUE) # safe to continue the DADA2 pipeline
-}
-
-
 d2w_dada$generate_quality_profile_plots <- function(experiment) {
     # Check if the experiment quality control section has the quality profile step
     if (is.null(experiment$quality_control$quality_profile_plot)) {
