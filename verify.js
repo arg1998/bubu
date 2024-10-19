@@ -211,9 +211,7 @@ function validateConfig(config) {
         errors.push('"quality_control.rarefaction_curve" must be a boolean.');
       }
 
-      if (!('multiqc' in qc)) {
-        errors.push('Missing "quality_control.multiqc" section.');
-      } else {
+      if ('multiqc' in qc) {
         const multiqc = qc.multiqc;
 
         // Check for required keys in "multiqc"
