@@ -12,12 +12,12 @@ The **Experiment Configuration File** is a [JSON-formatted](https://www.digitalo
 
 The configuration file is divided into several sequential stages:
 
-1. [**settings**](#settings)
-2. [**input_data**](#input_data)
-3. [**quality_control**](#quality_control)
-4. [**filter_and_trim**](#filter_and_trim)
-5. [**asv_inference**](#asv_inference)
-6. [**taxonomy_assignment**](#taxonomy_assignment)
+1. [**settings**](#1-settings)
+2. [**input_data**](#2-input_data)
+3. [**quality_control**](#3-quality_control)
+4. [**filter_and_trim**](#4-filter_and_trim)
+5. [**asv_inference**](#5-asv_inference)
+6. [**taxonomy_assignment**](#6-taxonomy_assignment)
 
 Each section contains related parameters and settings pertinent to different stages of the DADA2 pipeline. Bellow is a not-so-accurate description of an experiment.
 
