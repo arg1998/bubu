@@ -1,6 +1,4 @@
-# Documentation
-
-## Modules
+# Modules
 
 Each file inside the `modules/` directory is a support script that serves a purpose (e.g. timer, input/output, etc.). Each file has the following template:
 
