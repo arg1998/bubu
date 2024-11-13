@@ -35,6 +35,10 @@ for (experiment in experiment_configs) {
         file_path <- paste0(experiment$runtime$directory, "output/", file_name, "_", experiment$settings$name, ".RDS")
         saveRDS(obj, file = file_path)
     }
+    writeToFile <- function(obj, file_name, file_extention = ".txt") {
+        file_path <- paste0(experiment$runtime$directory, "output/", file_name, "_", experiment$settings$name, file_extention)
+        writeLines(obj, file_path)
+    }
 
     # --------------------- importing data
     d2w_logger$logs("Importing Data")
@@ -217,6 +221,10 @@ for (experiment in experiment_configs) {
     seq_tab_no_chimera <- removeBimeraDenovo(seq_table_from_mergers, method = "consensus", multithread = experiment$settings$multi_thread, verbose = experiment$settings$verbose_output)
     saveObj(seq_tab_no_chimera, "seq_tab_no_chimera")
 
+    # export ASVs to a .fasta file
+    asv_dict <- d2w_dada$generate_asv_dict(seq_tab_no_chimera) # keep a mapping between ASV keys and their sequences (e.g. ASV254 -> ACTGGCTA...)
+    asv_fasta <- d2w_dada$export_to_fasta(asv_dict)
+    writeToFile(asv_fasta, "asv_no_chimera", ".fasta")
 
     # -------------------- Generating tracking matrix
     d2w_logger$logs("Generating tracking matrix")

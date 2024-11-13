@@ -22,8 +22,8 @@ d2w_dada$generate_quality_profile_plots <- function(experiment) {
         d2w_logger$logi("Skipping quality profile plot generation")
         return()
     }
-    
-    if(!experiment$quality_control$quality_profile_plot){
+
+    if (!experiment$quality_control$quality_profile_plot) {
         d2w_logger$logi("Skipping quality profile plot generation")
         return()
     }
@@ -205,3 +205,23 @@ d2w_dada$sub_sample_input_files <- function(experiment) {
 }
 
 
+d2w_dada$export_to_fasta <- function(asv_dict, asv_as_key = TRUE) {
+    fasta <- c()
+    if (asv_as_key) {
+        fasta <- unlist(lapply(names(asv_dict), function(asv_id) {
+            c(paste0(">", asv_dict[[asv_id]], "\n"), asv_dict[[asv_id]])
+        }))
+    } else {
+        fasta <- unlist(lapply(names(asv_dict), function(asv_id) {
+            c(paste0(">", asv_id, "\n"), asv_dict[[asv_id]])
+        }))
+    }
+
+    return(fasta)
+}
+
+d2w_dada$generate_asv_dict <- function(seq_table) {
+    asv_list <- colnames(seq_table)
+    asv_dict <- setNames(as.list(asv_list), paste0("ASV", seq_along(asv_list)))
+    return(asv_dict)
+}
