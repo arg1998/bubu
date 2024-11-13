@@ -68,7 +68,8 @@ else
 
   # 4. Job output directory
   DEFAULT_OUTPUT_DIR="$(cd "$(dirname "$0")/.."; pwd)/slurm_logs"
-  read -p "4. Job output directory \n(press Enter for default: $DEFAULT_OUTPUT_DIR): " OUTPUT_DIR
+  echo "4. Job output directory"
+  read -p "     press Enter for default: $DEFAULT_OUTPUT_DIR: " OUTPUT_DIR
   if [[ -z "$OUTPUT_DIR" ]]; then
     OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
   fi
