@@ -65,8 +65,25 @@ else
     fi
   done
 
-  # 4. Email address for notifications (optional)
-  read -p "4. Email address for notifications (press Enter to skip): " EMAIL
+
+  # 4. Job output directory
+  DEFAULT_OUTPUT_DIR="$(cd "$(dirname "$0")/.."; pwd)/slurm_logs"
+  read -p "4. Job output directory \n(press Enter for default: $DEFAULT_OUTPUT_DIR): " OUTPUT_DIR
+  if [[ -z "$OUTPUT_DIR" ]]; then
+    OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
+  fi
+  
+  if [ ! -d "$OUTPUT_DIR" ]; then
+    mkdir -p "$OUTPUT_DIR"
+    if [ $? -ne 0 ]; then
+      echo "Failed to create directory '$OUTPUT_DIR'. Please check the path and try again."
+      exit 1
+    fi
+  fi
+
+
+  # 5. Email address for notifications (optional)
+  read -p "5. Email address for notifications (press Enter to skip): " EMAIL
   if [[ -n "$EMAIL" ]]; then
     # Validate the email format
     if [[ ! $EMAIL =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$ ]]; then
@@ -79,9 +96,10 @@ else
   echo ""
   echo "The following information has been provided:"
   echo "-------------------------------------------"
-  echo "Total time:            $TOTAL_TIME"
-  echo "Number of CPUs:        $NUM_CPUS"
-  echo "RAM memory size:       ${RAM_SIZE}G"
+  echo "Total time:              $TOTAL_TIME"
+  echo "Number of CPUs:          $NUM_CPUS"
+  echo "RAM memory size:         ${RAM_SIZE}G"
+  echo "Job output directory:    $OUTPUT_DIR"
   if [[ -n "$EMAIL" ]]; then
     echo "Email for notifications: $EMAIL"
   else
@@ -102,7 +120,8 @@ else
 #SBATCH --mem=${RAM_SIZE}G
 #SBATCH --cpus-per-task=$NUM_CPUS
 EOF
-
+    echo "#SBATCH --output=${OUTPUT_DIR}/%j-slurm-output.txt"
+    echo "#SBATCH --error=${OUTPUT_DIR}/%j-slurm-error.txt"
     if [[ -n "$EMAIL" ]]; then
       echo "#SBATCH --mail-type=ALL"
       echo "#SBATCH --mail-user=$EMAIL"
